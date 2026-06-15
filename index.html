@@ -1,50 +1,475 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Lisan</title>
-  <style>
-    :root { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --mute: #94a3b8; --blue: #3b82f6; --green: #10b981; --red: #ef4444; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: 80px; }
-    .wrap { max-width: 400px; margin: 0 auto; padding: 20px; }
-    header { text-align: center; margin-bottom: 24px; }
-    h1 { font-size: 28px; font-weight: 700; }
-    p.subtitle { color: var(--mute); font-size: 14px; }
-    .stats { display: flex; gap: 12px; margin-bottom: 24px; }
-    .stat { flex: 1; background: var(--card); border-radius: 16px; padding: 12px 16px; text-align: center; font-size: 14px; }
-    .card { height: 200px; background: var(--card); border-radius: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px 16px; cursor: pointer; position: relative; }
-    .word-ar { font-size: 48px; font-family: 'Tahoma', sans-serif; text-align: center; margin-bottom: 12px; }
-    .word-ru { font-size: 28px; font-weight: 500; color: var(--green); display: none; text-align: center; }
-    .hint { position: absolute; bottom: 16px; color: var(--mute); font-size: 14px; }
-    .actions { display: flex; justify-content: space-between; margin: 24px 0; }
-    .btn { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; user-select: none; }
-    .btn-red { background: var(--red); } .btn-gray { background: #334155; } .btn-green { background: var(--green); }
-    .btn-next { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 600; margin-top: 8px; }
-    .footer { text-align: center; color: var(--mute); font-size: 12px; margin-top: 20px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lisan - Изучение арабского</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --card-hover: #334155;
+  --text: #f1f5f9;
+  --mute: #94a3b8;
+  --blue: #3b82f6;
+  --blue-hover: #2563eb;
+  --green: #10b981;
+  --green-hover: #059669;
+  --red: #ef4444;
+  --red-hover: #dc2626;
+  --purple: #8b5cf6;
+  --yellow: #fbbf24;
+}
+
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
+  overflow-x: hidden;
+}
+
+.wrap { 
+  max-width: 400px; 
+  margin: 0 auto; 
+  padding: 20px; 
+}
+
+header { 
+  text-align: center; 
+  margin-bottom: 24px; 
+}
+
+h1 { 
+  font-size: 32px; 
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+p.subtitle { 
+  color: var(--mute); 
+  font-size: 14px; 
+}
+
+.stats {
+  display: flex; 
+  gap: 12px; 
+  margin-bottom: 24px;
+}
+
+.stat {
+  flex: 1;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  transition: transform 0.2s;
+}
+
+.stat:hover {
+  transform: translateY(-2px);
+}
+
+.stat span {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--blue);
+  margin-top: 4px;
+}
+
+.card {
+  height: 240px;
+  background: linear-gradient(135deg, var(--card) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.card:active {
+  transform: translateY(-2px);
+}
+
+.word-ar { 
+  font-size: 52px; 
+  font-family: 'Tahoma', 'Arial', sans-serif; 
+  text-align: center; 
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.word-ru { 
+  font-size: 32px; 
+  font-weight: 600; 
+  color: var(--green); 
+  display: none; 
+  text-align: center; 
+}
+
+.hint { 
+  position: absolute; 
+  bottom: 16px; 
+  color: var(--mute); 
+  font-size: 13px; 
+  opacity: 0.8;
+}
+
+.speak-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 2px solid var(--blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 20px;
+  z-index: 10;
+}
+
+.speak-btn:hover {
+  background: var(--blue);
+  transform: scale(1.1);
+}
+
+.speak-btn:active {
+  transform: scale(0.95);
+}
+
+.actions { 
+  display: flex; 
+  justify-content: space-between; 
+  margin: 24px 0; 
+  gap: 12px;
+}
+
+.btn {
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  font-size: 24px; 
+  font-weight: bold;
+  user-select: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-red { 
+  background: var(--red); 
+}
+
+.btn-red:hover {
+  background: var(--red-hover);
+}
+
+.btn-gray { 
+  background: #334155; 
+}
+
+.btn-gray:hover {
+  background: #475569;
+}
+
+.btn-green { 
+  background: var(--green); 
+}
+
+.btn-green:hover {
+  background: var(--green-hover);
+}
+
+.btn-next {
+  width: 100%; 
+  padding: 16px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  color: white;
+  border: none; 
+  border-radius: 16px;
+  font-size: 18px; 
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-next:active {
+  transform: translateY(0);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 3px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.footer { 
+  text-align: center; 
+  color: var(--mute); 
+  font-size: 12px; 
+  margin-top: 20px;
+  opacity: 0.8;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.speaking {
+  animation: pulse 1s infinite;
+}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Lisan</h1><p class="subtitle">Учите арабский — по одному слову за раз</p></header>
-  <div class="stats"><div class="stat"><span id="learned">0</span> слов выучено</div><div class="stat"><span id="percent">0</span>% из 24 слов</div></div>
-  <div class="card" onclick="toggle()"><div class="word-ar" id="ar">نَعَم</div><div class="word-ru" id="ru">да</div><div class="hint" id="hint">Нажмите, чтобы показать перевод</div></div>
-  <div class="actions"><button class="btn btn-red" onclick="wrong()">✕</button><button class="btn btn-gray" onclick="toggle()">↻</button><button class="btn btn-green" onclick="correct()">✓</button></div>
+  <header>
+    <h1>📚 Lisan</h1>
+    <p class="subtitle">Учите арабский — по одному слову за раз</p>
+  </header>
+  
+  <div class="stats">
+    <div class="stat">
+      <span id="learned">0</span>
+      слов выучено
+    </div>
+    <div class="stat">
+      <span id="percent">0</span>%
+      из 24 слов
+    </div>
+  </div>
+  
+  <div class="card" onclick="toggle()">
+    <button class="speak-btn" onclick="event.stopPropagation(); speak()" title="Прослушать произношение">🔊</button>
+    <div class="word-ar" id="ar">نَعَم</div>
+    <div class="word-ru" id="ru">да</div>
+    <div class="hint" id="hint">Нажмите, чтобы показать перевод</div>
+  </div>
+  
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width: 0%"></div>
+  </div>
+  
+  <div class="actions">
+    <button class="btn btn-red" onclick="wrong()" title="Повторить">✕</button>
+    <button class="btn btn-gray" onclick="toggle()" title="Перевернуть карточку">↻</button>
+    <button class="btn btn-green" onclick="correct()" title="Знаю">✓</button>
+  </div>
+  
   <button class="btn-next" onclick="next()">Следующее слово →</button>
-  <p class="footer">Проведите пальцем вправо — знаю • влево — повторить</p>
+  
+  <p class="footer">
+    👆 Нажмите на 🔊 для прослушивания • Проведите вправо — знаю • влево — повторить
+  </p>
 </div>
+
 <script>
-const WORDS = [{a:'نَعَم',r:'да'},{a:'لا',r:'нет'},{a:'مرحبا',r:'привет'},{a:'شكرا',r:'спасибо'},{a:'من فضلك',r:'пожалуйста'},{a:'مع السلامة',r:'до свидания'},{a:'ماء',r:'вода'},{a:'خبز',r:'хлеб'},{a:'كتاب',r:'книга'},{a:'قلم',r:'ручка'},{a:'بيت',r:'дом'},{a:'شمس',r:'солнце'},{a:'قمر',r:'луна'},{a:'كلب',r:'собака'},{a:'قطة',r:'кошка'},{a:'طفل',r:'ребёнок'},{a:'امرأة',r:'женщина'},{a:'رجل',r:'мужчина'},{a:'يوم',r:'день'},{a:'ليل',r:'ночь'},{a:'صغير',r:'маленький'},{a:'كبير',r:'большой'},{a:'جيد',r:'хороший'},{a:'سيء',r:'плохой'}];
+const WORDS = [
+  { a: 'نَعَم', r: 'да' },
+  { a: 'لا', r: 'нет' },
+  { a: 'مرحبا', r: 'привет' },
+  { a: 'شكرا', r: 'спасибо' },
+  { a: 'من فضلك', r: 'пожалуйста' },
+  { a: 'مع السلامة', r: 'до свидания' },
+  { a: 'ماء', r: 'вода' },
+  { a: 'خبز', r: 'хлеб' },
+  { a: 'كتاب', r: 'книга' },
+  { a: 'قلم', r: 'ручка' },
+  { a: 'بيت', r: 'дом' },
+  { a: 'شمس', r: 'солнце' },
+  { a: 'قمر', r: 'луна' },
+  { a: 'كلب', r: 'собака' },
+  { a: 'قطة', r: 'кошка' },
+  { a: 'طفل', r: 'ребёнок' },
+  { a: 'امرأة', r: 'женщина' },
+  { a: 'رجل', r: 'мужчина' },
+  { a: 'يوم', r: 'день' },
+  { a: 'ليل', r: 'ночь' },
+  { a: 'صغير', r: 'маленький' },
+  { a: 'كبير', r: 'большой' },
+  { a: 'جيد', r: 'хороший' },
+  { a: 'سيء', r: 'плохой' }
+];
+
 let idx = parseInt(localStorage.getItem('lisan_idx') || '0');
 let learned = parseInt(localStorage.getItem('lisan_learned') || '0');
-function update() { const w = WORDS[idx]; document.getElementById('ar').textContent = w.a; document.getElementById('ru').textContent = w.r; document.getElementById('learned').textContent = learned; document.getElementById('percent').textContent = Math.round((learned / WORDS.length) * 100); }
-function toggle() { const ru = document.getElementById('ru'); const hint = document.getElementById('hint'); if (ru.style.display === 'none') { document.getElementById('ar').style.display = 'none'; ru.style.display = 'block'; hint.textContent = 'Нажмите, чтобы скрыть'; } else { ru.style.display = 'none'; document.getElementById('ar').style.display = 'block'; hint.textContent = 'Нажмите, чтобы показать перевод'; } }
-function correct() { learned = Math.min(learned + 1, WORDS.length); localStorage.setItem('lisan_learned', learned.toString()); next(); }
-function wrong() { next(); }
-function next() { idx = (idx + 1) % WORDS.length; localStorage.setItem('lisan_idx', idx.toString()); toggle(); update(); }
-update(); document.getElementById('ru').style.display = 'none';
+let isSpeaking = false;
+
+function update() {
+  const w = WORDS[idx];
+  document.getElementById('ar').textContent = w.a;
+  document.getElementById('ru').textContent = w.r;
+  document.getElementById('learned').textContent = learned;
+  const percent = Math.round((learned / WORDS.length) * 100);
+  document.getElementById('percent').textContent = percent;
+  document.getElementById('progress').style.width = percent + '%';
+}
+
+function toggle() {
+  const ru = document.getElementById('ru');
+  const hint = document.getElementById('hint');
+  if (ru.style.display === 'none') {
+    document.getElementById('ar').style.display = 'none';
+    ru.style.display = 'block';
+    hint.textContent = 'Нажмите, чтобы скрыть';
+  } else {
+    ru.style.display = 'none';
+    document.getElementById('ar').style.display = 'block';
+    hint.textContent = 'Нажмите, чтобы показать перевод';
+  }
+}
+
+function speak() {
+  if ('speechSynthesis' in window) {
+    // Отменяем предыдущее воспроизведение
+    window.speechSynthesis.cancel();
+    
+    const w = WORDS[idx];
+    const utterance = new SpeechSynthesisUtterance(w.a);
+    utterance.lang = 'ar-SA'; // Арабский язык (Саудовская Аравия)
+    utterance.rate = 0.8; // Немного медленнее для лучшего понимания
+    utterance.pitch = 1;
+    
+    const speakBtn = document.querySelector('.speak-btn');
+    speakBtn.classList.add('speaking');
+    isSpeaking = true;
+    
+    utterance.onend = function() {
+      speakBtn.classList.remove('speaking');
+      isSpeaking = false;
+    };
+    
+    utterance.onerror = function() {
+      speakBtn.classList.remove('speaking');
+      isSpeaking = false;
+      console.error('Ошибка воспроизведения речи');
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  } else {
+    alert('Ваш браузер не поддерживает воспроизведение речи');
+  }
+}
+
+function correct() {
+  learned = Math.min(learned + 1, WORDS.length);
+  localStorage.setItem('lisan_learned', learned.toString());
+  next();
+}
+
+function wrong() {
+  next();
+}
+
+function next() {
+  idx = (idx + 1) % WORDS.length;
+  localStorage.setItem('lisan_idx', idx.toString());
+  
+  // Сбрасываем вид карточки
+  document.getElementById('ru').style.display = 'none';
+  document.getElementById('ar').style.display = 'block';
+  document.getElementById('hint').textContent = 'Нажмите, чтобы показать перевод';
+  
+  update();
+}
+
+// Добавляем поддержку свайпов для мобильных устройств
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.querySelector('.card').addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, false);
+
+document.querySelector('.card').addEventListener('touchend', function(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+}, false);
+
+function handleSwipe() {
+  const swipeThreshold = 50;
+  const diff = touchStartX - touchEndX;
+  
+  if (Math.abs(diff) > swipeThreshold) {
+    if (diff > 0) {
+      // Свайп влево - повторить
+      wrong();
+    } else {
+      // Свайп вправо - знаю
+      correct();
+    }
+  }
+}
+
+// Инициализация
+update();
+document.getElementById('ru').style.display = 'none';
 </script>
 </body>
 </html>
+
+
 
